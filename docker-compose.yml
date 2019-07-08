@@ -30,6 +30,9 @@ services:
       - PGDATABASE=postgres
       - REDIS_HOST=redis
       - REDIS_PORT=6379
+    depends_on:
+      - postgres
+      - redis
 
   client:
     build:
@@ -38,6 +41,8 @@ services:
     volumes:
         - /app/node_modules
         - ./client:/app
+    depends_on:
+      - api
 
   worker:
     build:
@@ -49,3 +54,5 @@ services:
     environment:
       - REDIS_HOST=redis
       - REDIS_PORT=6379
+    depends_on:
+      - redis
