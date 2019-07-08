@@ -1,0 +1,41 @@
+sudo: required
+language: node_js
+node_js:
+  - '12'
+cache:
+  directories:
+    - node_modules
+
+services:
+  - docker
+
+before_install:
+  - docker build -t jakeklassen/react-test -f ./client/Dockerfile.dev ./client
+
+# CI=true is used to allow the tests to exit when done
+script:
+  - docker run --env CI=true jakeklassen/react-test yarn test
+
+# Build production images
+after_success:
+  - docker build -t jakeklassen/multi-client ./client
+  - docker build -t jakeklassen/multi-nginx ./nginx
+  - docker build -t jakeklassen/multi-server ./server
+  - docker build -t jakeklassen/multi-worker ./worker
+  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
+  - docker push jakeklassen/multi-client
+  - docker push jakeklassen/multi-nginx
+  - docker push jakeklassen/multi-server
+  - docker push jakeklassen/multi-worker
+
+deploy:
+  provider: elasticbeanstalk
+  region: 'us-east-1'
+  app: 'multi-docker'
+  env: 'MultiDocker-env'
+  bucket_name: 'elasticbeanstalk-us-east-1-646145303921'
+  bucket_path: 'multi-docker'
+  on:
+    branch: master
+  access_key_id: "$AWS_ACCESS_KEY"
+  secret_access_key: "$AWS_SECRET_KEY"
