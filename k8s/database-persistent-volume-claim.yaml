@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: database-persistent-volume-claim
+spec:
+  accessModes:
+    # Read/Write by SINGLE NODE only
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 2Gi
+  # Gives us the ability to state the default storage class we'd like
+  # to use. You can imagine the default while on minikube us your HDD.
+  # While on GCP it would be there own default that is set when you
+  # create your cluster.
+  # storageClassName: 
