@@ -21,7 +21,7 @@ before_install:
 
 script:
   # CI=true is used to prevent react tests from using watch mode
-  - CI=true docker run jakeklassen/react-test yarn test
+  - docker run --env CI=true jakeklassen/react-test yarn test
 
 deploy:
   provider: script
